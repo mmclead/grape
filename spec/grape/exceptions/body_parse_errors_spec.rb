@@ -50,6 +50,28 @@ describe Grape::Exceptions::ValidationErrors do
         expect(last_response.body).to eq('message was processed')
       end
     end
+
+    context 'and rescue_grape_errors set to true' do
+      before do
+        subject.rescue_from :all, rescue_grape_errors: true
+      end
+
+      context 'with content_type json' do
+        it 'returns body parsing error message' do
+          post '/beer', 'test', 'CONTENT_TYPE' => 'application/json'
+          expect(last_response.status).to eq 400
+          expect(last_response.body).to include "message body does not match declared format"
+        end
+      end
+
+      context 'with content_type xml' do
+        it 'returns body parsing error message' do
+          post '/beer', 'test', 'CONTENT_TYPE' => 'application/xml'
+          expect(last_response.status).to eq 400
+          expect(last_response.body).to include "message body does not match declared format"
+        end
+      end
+    end
   end
 
   context 'api without a rescue handler' do
